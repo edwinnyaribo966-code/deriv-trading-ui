@@ -1,6 +1,6 @@
 // Your Configuration
 const APP_ID = '1089';
-const DERIV_WS_URL =\ wss://://derivws.com{APP_ID}`;
+const DERIV_WS_URL = `wss://derivws.com/${APP_ID}`;
 let socket;
 let heartbeatInterval;
 
@@ -11,14 +11,14 @@ const marketSelect = document.getElementById('market-select');
 const priceDisplay = document.getElementById('price-display');   
 
 // Helper to log actions to your visual terminal box
-function appendLog(message, type = 'Info') 
+function appendLog(message, type = 'Info') {
     const logTerminal = document.getElementById('log-terminal');
     if (!logTerminal) return;
 
     const logLine = document.createElement('div');
     const timestamp = new Date().toLocaleTimeString();
-    logLine.innerText = \[${timestamp}] [${type}] ${message}`;
-    logLine.className = ``log-${type.toLowerCase()}`;
+    logLine.innerText = `[${timestamp}] [${type}] ${message}`;
+    logLine.className = `log-${type.toLowerCase()}`;
     
     logTerminal.appendChild(logLine);
     logTerminal.scrollTop = logTerminal.scrollHeight;
