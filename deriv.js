@@ -1,7 +1,6 @@
 // Your Configuration
 const APP_ID = '1089';
 const DERIV_WS_URL = `wss://://derivws.com{APP_ID}`;
-
 let socket;
 let heartbeatInterval;
 
