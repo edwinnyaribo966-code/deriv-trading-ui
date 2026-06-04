@@ -22,7 +22,12 @@
 <body>
 
     <div class="container">
-        <h1>LIVE Market Terminal</h1>
+        <h1>LIVE Market Terminal</h1> 
+        <div style="margin-bottom: 20px; padding: 15px; background: #1e222d; border-radius: 8px; border: 1px solid #2a2e39;">
+            <div class="label" style="margin-bottom: 8px;">Deriv API Token</div>
+            <input type="password" id="api-token" placeholder="Paste your token here..." style="width: 100%; padding: 10px; background: #0b0e11; color: white; border: 1px solid #2a2e39; border-radius: 4px; box-sizing: border-box; margin-bottom: 10px;">
+            <button id="connect-btn" style="width: 100%; padding: 10px; background: #0ecb81; color: #11141a; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Connect Terminal</button>
+        </div>
         
         <div class="metric">
             <div class="label">Status</div>
@@ -30,9 +35,9 @@
         </div>
 
         <div class="metric">
-            <div class="label">Select Market Index</div>
-            <select id="marketSelect">
-                <option value="R_100">Volatility 100 (1s) Index</option>
+            <div class="label">select-market Index</div>
+            <select id="market-select">
+                <option value="1HZ100V">Volatility 100 (1s) Index</option>
                 <option value="R_75">Volatility 75 Index</option>
                 <option value="R_50">Volatility 50 Index</option>
                 <option value="R_25">Volatility 25 Index</option>
@@ -42,7 +47,7 @@
 
         <div class="metric">
             <div class="label">Latest Feed Tick</div>
-            <div id="price">$0.0000</div>
+            <div id="price-display">$0.0000</div>
         </div>
 
         <div class="label">Live Connection Activity Logs</div>

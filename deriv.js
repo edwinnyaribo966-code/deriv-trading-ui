@@ -1,113 +1,91 @@
-
-// Your Deriv Configuration
-const APP_ID = '1089'; 
-const API_TOKEN = '33sSwGhNKohL4qgSshZxY';
-const DERIV_WS_URL = `wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`;
+// Your Configuration
+const APP_ID = '1089';
+const DERIV_WS_URL = `wss://://derivws.com{APP_ID}`;
 
 let socket;
 let heartbeatInterval;
 
-// Helper to print logs onto your dashboard terminal screen
+// Select your HTML elements
+const connectBtn = document.getElementById('connect-btn');
+const tokenInput = document.getElementById('api-token');
+const marketSelect = document.getElementById('market-select'); 
+const priceDisplay = document.getElementById('price-display');   
+
+// Helper to log actions to your visual terminal box
 function appendLog(message, type = 'Info') {
     const logTerminal = document.getElementById('log-terminal');
     if (!logTerminal) return;
-    
+
     const logLine = document.createElement('div');
     const timestamp = new Date().toLocaleTimeString();
-    logLine.innerText = `[${timestamp}] ${message}`;
-    
-    if (type === 'error') logLine.className = 'text-red-500';
-    if (type === 'success') logLine.className = 'text-green-400';
-    if (type === 'tick') logLine.className = 'text-gray-400';
+    logLine.innerText = `[${timestamp}] [${type}] ${message}`;
+    logLine.className = `log-${type.toLowerCase()}`;
     
     logTerminal.appendChild(logLine);
-    logTerminal.scrollTop = logTerminal.scrollHeight; // Auto-scroll
+    logTerminal.scrollTop = logTerminal.scrollHeight;
 }
 
-// Initialize the live market connection
-function initWebSocket() {
-    appendLog("Establishing active WebSocket handshake with Deriv servers...", "Info");
+// Main function to establish connection
+function initializeTerminal() {
+    const token = tokenInput.value.trim();
+    if (!token) {
+        alert("Please enter a valid API token first!");
+        return;
+    }
+
+    appendLog("Establishing active WebSocket handshake with Deriv servers...", "System");
     socket = new WebSocket(DERIV_WS_URL);
 
-    socket.onopen = () => {
-        const statusText = document.getElementById('statusText');
-        if (statusText) statusText.innerText = "Connected to Deriv Feed";
-        appendLog("WebSocket connection successfully verified.", "success");
-        
-        // Authenticate with your token
-        socket.send(JSON.stringify({ authorize: API_TOKEN }));
-        startHeartbeat();
+    // 1. Connection Opened
+    socket.onopen = function() {
+        appendLog("WebSocket connection successfully verified.", "Success");
+        socket.send(JSON.stringify({ authorize: token }));
+
+        // Heartbeat ping every 30 seconds
+        heartbeatInterval = setInterval(() => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ ping: 1 }));
+            }
+        }, 30000);
     };
 
-    socket.onmessage = (event) => {
+    // 2. Data Packets Received
+    socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        
-        // Handle successful login
-        if (data.msg_type === 'authorize' && !data.error) {
-            appendLog(`Authenticated successfully as: ${data.authorize.email}`, "success");
-            // Stream default market: Volatility 100 (1s) Index
-            socket.send(JSON.stringify({ ticks: 'R_100' }));
-        }
+        if (data.msg_type === 'ping') return;
 
-        // Handle errors
         if (data.error) {
-            appendLog(`Deriv API Error: ${data.error.message}`, "error");
+            appendLog(`Deriv API Error: ${data.error.message}`, "Error");
             return;
         }
 
-        // Handle live prices
-        if (data.tick) {
-            const livePrice = data.tick.quote;
-            const priceDisplay = document.getElementById('price');
-            if (priceDisplay) {
-                priceDisplay.innerText = `$${livePrice.toFixed(2)}`;
-            }
-            appendLog(`Tick Received: ${data.tick.symbol} -> $${livePrice.toFixed(2)}`, 'tick');
+        if (data.msg_type === 'authorize') {
+            appendLog(`Authorized successfully as ${data.authorize.email}`, "Success");
+            startPriceStream();
+        }
+
+        if (data.msg_type === 'tick' && data.tick) {
+            const currentPrice = data.tick.quote;
+            priceDisplay.innerText = `$${parseFloat(currentPrice).toFixed(4)}`;
         }
     };
 
-    socket.onerror = (error) => {
-        appendLog("Stream socket encountered an explicit structural error.", "error");
-        const statusText = document.getElementById('statusText');
-        if (statusText) statusText.innerText = "Connection Error";
-    };
-    
-    socket.onclose = () => {
-        appendLog("Network socket closed. Attempting reconnect sequence in 5 seconds...", "error");
-        const statusText = document.getElementById('statusText');
-        if (statusText) statusText.innerText = "Reconnecting...";
+    // 3. Connection Disconnects
+    socket.onclose = function() {
+        appendLog("WebSocket connection closed.", "Warn");
         clearInterval(heartbeatInterval);
-        setTimeout(initWebSocket, 5000);
+    };
+
+    // 4. Transport Errors
+    socket.onerror = function(error) {
+        appendLog("A transport level error occurred.", "Error");
     };
 }
 
-// Keep connection alive by pinging server every 30 seconds
-function startHeartbeat() {
-    clearInterval(heartbeatInterval);
-    heartbeatInterval = setInterval(() => {
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ ping: 1 }));
-        }
-    }, 30000);
+function startPriceStream() {
+    const selectedAsset = marketSelect.value; 
+    appendLog(`Subscribing to real-time feed for: ${selectedAsset}`, "System");
+    socket.send(JSON.stringify({ ticks: selectedAsset }));
 }
 
-// Handle market stream dropdown changes
-function changeMarketStream(newSymbol) {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-        appendLog(`Changing stream channel to: ${newSymbol}`, "Info");
-        socket.send(JSON.stringify({ forget_all: "ticks" }));
-        socket.send(JSON.stringify({ ticks: newSymbol }));
-    }
-}
-
-// Boot up the connection and link dropdown events when page loads
-window.addEventListener('DOMContentLoaded', () => {
-    initWebSocket();
-    
-    const marketSelect = document.getElementById('marketSelect');
-    if (marketSelect) {
-        marketSelect.addEventListener('change', (e) => {
-            changeMarketStream(e.target.value);
-        });
-    }
-});
+connectBtn.addEventListener('click', initializeTerminal);
