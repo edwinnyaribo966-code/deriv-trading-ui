@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Market Dashboard</title>
+    <!-- Modern Styling via Tailwind CSS CDN -->
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        /* Custom dark theme refinements */
+        body { background-color: #0b0f19; color: #f3f4f6; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-bold tracking-wider text-red-500">LIVE</span>
+            <span class="text-xl font-semibold">Market Terminal</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- Connection Status Indicator -->
+            <div class="flex items-center space-x-2 bg-gray-800 px-3 py-1.5 rounded-full text-xs font-medium">
+                <span id="status-dot" class="w-2.5 h-2.5 bg-yellow-500 rounded-full animate-pulse"></span>
+                <span id="status-text" class="text-gray-300">Connecting to API...</span>
+            </div>
+            <button id="account-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                Live Account
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Workspace -->
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left Side: Market Metrics & Metrics Summary -->
+        <div class="space-y-6 lg:col-span-1">
+            <!-- Account Balance Card -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm">
+                <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider">Available Balance</h2>
+                <div class="mt-2 flex items-baseline space-x-2">
+                    <span class="text-3xl font-extrabold tracking-tight">$</span>
+                    <span id="balance-amount" class="text-3xl font-extrabold tracking-tight">0.00</span>
+                    <span class="text-sm font-semibold text-gray-400">USD</span>
+                </div>
+                <p id="account-id-display" class="mt-1 text-xs text-gray-500">ID: Not Connected</p>
+            </div>
+
+            <!-- Market Selector & Order Placer -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm space-y-4">
+                <h3 class="text-lg font-semibold text-white">Market Controls</h3>
+                
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Select Volatility Index</label>
+                    <select id="market-select" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white">
+                        <option value="R_10">Volatility 10 Index</option>
+                        <option value="R_50">Volatility 50 Index</option>
+                        <option value="R_100">Volatility 100 Index</option>
+                    </select>
+                </div>
+
+                <div class="pt-2">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>Latest Feed Tick</span>
+                        <span id="tick-timestamp">--:--:--</span>
+                    </div>
+                    <div id="live-tick-price" class="text-2xl font-mono font-bold text-center bg-gray-900 py-3 rounded-lg border border-gray-800 text-gray-300">
+                        0.0000
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Chart & Data Visualizer -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm h-full flex flex-col min-h-[400px]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-white">Live Market Chart Feed</h3>
+                    <span class="text-xs bg-gray-800 text-blue-400 px-2 py-1 rounded">Real-time</span>
+                </div>
+                <!-- Interactive Chart Container Placeholder -->
+                <div class="flex-1 bg-gray-950 border border-gray-800 rounded-lg flex flex-col items-center justify-center relative overflow-hidden p-4">
+                    <p class="text-sm text-gray-500 z-10 text-center">
+                        Chart data feed updates dynamically when connected.<br>
+                        <span class="text-xs text-gray-600">Integrate WebSockets or lightweight charting libraries here.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Background logic to safely handle layout initialization status -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Market terminal interface layout initialized successfully.');
+            // This is a UI container script. 
+            // Real application logic can be safely wired here to parse clean WebSocket streams.
+            setTimeout(() => {
+                document.getElementById('status-dot').className = "w-2.5 h-2.5 bg-green-500 rounded-full";
+                document.getElementById('status-text').innerText = "Layout Active (Sandbox Mode)";
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
