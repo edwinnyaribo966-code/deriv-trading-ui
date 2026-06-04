@@ -2,7 +2,7 @@
 // Your Deriv Configuration
 const APP_ID = '1089'; 
 const API_TOKEN = '33sSwGhNKohL4qgSshZxY';
-const DERIV_WS_URL = `wss://://derivws.com{APP_ID}`;
+const DERIV_WS_URL = `wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`;
 
 let socket;
 let heartbeatInterval;
